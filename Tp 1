@@ -1,0 +1,249 @@
+- [ ] #include <stdio.h>
+- [ ] #include <stdlib.h>
+
+- [ ] typedef struct Noeud {
+- [ ]     int valeur;
+- [ ]     struct Noeud *suivant;
+- [ ] } Noeud;
+
+- [ ] Noeud *cree(int valeur) {
+- [ ]     Noeud *nouveau = (Noeud *)malloc(sizeof(Noeud));
+- [ ]     nouveau->valeur = valeur;
+- [ ]     nouveau->suivant = NULL;
+- [ ]     return nouveau;
+- [ ] }
+
+- [ ] void affiche(Noeud *debut) {
+- [ ]     Noeud *courant = debut;
+- [ ]     while (courant != NULL) {
+- [ ]         printf("Valeur : %d\n", courant->valeur);
+- [ ]         courant = courant->suivant;
+- [ ]     }
+- [ ] }
+
+- [ ] Noeud *ajouterDebut(Noeud *debut, int valeur) {
+- [ ]     Noeud *nouveau = (Noeud *)malloc(sizeof(Noeud));
+- [ ]     nouveau->valeur = valeur;
+- [ ]     nouveau->suivant = debut;
+- [ ]     return nouveau;
+- [ ] }
+
+- [ ] Noeud *ajouterFin(Noeud *debut, int valeur) {
+- [ ]     Noeud *nouveau = (Noeud *)malloc(sizeof(Noeud));
+- [ ]     nouveau->valeur = valeur;
+- [ ]     nouveau->suivant = NULL;
+
+- [ ]     if (debut == NULL) return nouveau;
+
+- [ ]     Noeud *courant = debut;
+- [ ]     while (courant->suivant != NULL) {
+- [ ]         courant = courant->suivant;
+- [ ]     }
+- [ ]     courant->suivant = nouveau;
+- [ ]     return debut;
+- [ ] }
+
+- [ ] void rechercher(Noeud *debut, int valeur) {
+- [ ]     Noeud *courant = debut;
+- [ ]     while (courant != NULL) {
+- [ ]         if (courant->valeur == valeur) {
+- [ ]             printf("La valeur existe\n");
+- [ ]             return;
+- [ ]         }
+- [ ]         courant = courant->suivant;
+- [ ]     }
+- [ ]     printf("La valeur n'existe pas\n");
+- [ ] }
+
+- [ ] int taille(Noeud *debut) {
+- [ ]     int t = 0;
+- [ ]     Noeud *courant = debut;
+- [ ]     while (courant != NULL) {
+- [ ]         t++;
+- [ ]         courant = courant->suivant;
+- [ ]     }
+- [ ]     return t;
+- [ ] }
+
+- [ ] Noeud *insertion(Noeud *debut, int pos, int val) {
+- [ ]     Noeud *nouveau = (Noeud *)malloc(sizeof(Noeud));
+- [ ]     nouveau->valeur = val;
+- [ ]     nouveau->suivant = NULL;
+
+- [ ]     int t = taille(debut);
+- [ ]     if (pos < 1 || pos > t + 1) {
+- [ ]         printf("Position incorrecte\n");
+- [ ]         return debut;
+- [ ]     }
+
+- [ ]     if (pos == 1) {
+- [ ]         nouveau->suivant = debut;
+- [ ]         return nouveau;
+- [ ]     }
+
+- [ ]     Noeud *courant = debut;
+- [ ]     for (int i = 1; i < pos - 1; i++) {
+- [ ]         courant = courant->suivant;
+- [ ]     }
+- [ ]     nouveau->suivant = courant->suivant;
+- [ ]     courant->suivant = nouveau;
+- [ ]     return debut;
+- [ ] }
+
+- [ ] Noeud *suppressionDebut(Noeud *debut) {
+- [ ]     if (debut == NULL) {
+- [ ]         printf("Liste vide\n");
+- [ ]         return NULL;
+- [ ]     }
+- [ ]     Noeud *tmp = debut;
+- [ ]     debut = debut->suivant;
+- [ ]     free(tmp);
+- [ ]     return debut;
+- [ ] }
+
+- [ ] Noeud *suppressionFin(Noeud *debut) {
+- [ ]     if (debut == NULL) {
+- [ ]         printf("Liste vide\n");
+- [ ]         return NULL;
+- [ ]     }
+
+- [ ]     if (debut->suivant == NULL) {
+- [ ]         free(debut);
+- [ ]         return NULL;
+- [ ]     }
+
+- [ ]     Noeud *courant = debut;
+- [ ]     while (courant->suivant->suivant != NULL) {
+- [ ]         courant = courant->suivant;
+- [ ]     }
+
+- [ ]     free(courant->suivant);
+- [ ]     courant->suivant = NULL;
+- [ ]     return debut;
+- [ ] }
+
+- [ ] Noeud *suppressionPosition(Noeud *debut, int pos) {
+- [ ]     if (debut == NULL) {
+- [ ]         printf("Liste vide\n");
+- [ ]         return NULL;
+- [ ]     }
+
+- [ ]     int t = taille(debut);
+- [ ]     if (pos < 1 || pos > t) {
+- [ ]         printf("Position invalide\n");
+- [ ]         return debut;
+- [ ]     }
+
+- [ ]     if (pos == 1) {
+- [ ]         Noeud *tmp = debut;
+        debut = debut->suivant;
+        free(tmp);
+        return debut;
+    }
+
+    Noeud *courant = debut;
+    for (int i = 1; i < pos - 1; i++) {
+        courant = courant->suivant;
+    }
+
+    Noeud *tmp = courant->suivant;
+    courant->suivant = tmp->suivant;
+    free(tmp);
+    return debut;
+}
+
+Noeud *modifierDebut(Noeud *debut, int valeur) {
+    if (debut == NULL) return NULL;
+    debut->valeur = valeur;
+    return debut;
+}
+
+Noeud *modifierFin(Noeud *debut, int valeur) {
+    if (debut == NULL) {
+        printf("Liste vide\n");
+        return NULL;
+    }
+
+    Noeud *courant = debut;
+    while (courant->suivant != NULL) {
+        courant = courant->suivant;
+    }
+    courant->valeur = valeur;
+    return debut;
+}
+
+Noeud *modifierPosition(Noeud *debut, int pos, int valeur) {
+    if (debut == NULL) {
+        printf("Liste vide\n");
+        return NULL;
+    }
+
+    int t = taille(debut);
+    if (pos < 1 || pos > t) {
+        printf("Position invalide\n");
+        return debut;
+    }
+
+    Noeud *courant = debut;
+    for (int i = 1; i < pos; i++) {
+        courant = courant->suivant;
+    }
+    courant->valeur = valeur;
+    return debut;
+}
+
+int main() {
+    Noeud *debut = NULL;
+    Noeud *n1 = cree(10);
+    Noeud *n2 = cree(20);
+    Noeud *n3 = cree(30);
+
+    debut = n1;
+    n1->suivant = n2;
+    n2->suivant = n3;
+
+    printf("Affichage initial :\n");
+    affiche(debut);
+
+    debut = ajouterDebut(debut, 100);
+    printf("Après ajout au début :\n");
+    affiche(debut);
+
+    debut = ajouterFin(debut, 200);
+    printf("Après ajout à la fin :\n");
+    affiche(debut);
+
+    rechercher(debut, 20);
+
+    printf("Taille de la liste : %d\n", taille(debut));
+
+    debut = insertion(debut, 3, 555);
+    printf("Après insertion en position 3 :\n");
+    affiche(debut);
+
+    debut = suppressionDebut(debut);
+    printf("Après suppression au début :\n");
+    affiche(debut);
+
+    debut = suppressionFin(debut);
+    printf("Après suppression à la fin :\n");
+    affiche(debut);
+
+    debut = suppressionPosition(debut, 4);
+    printf("Après suppression à la position 4 :\n");
+    affiche(debut);
+
+    debut = modifierDebut(debut, 2024);
+    printf("Après modification du début :\n");
+    affiche(debut);
+
+    debut = modifierFin(debut, 2025);
+    printf("Après modification de la fin :\n");
+    affiche(debut);
+
+    debut = modifierPosition(debut, 1, 2000);
+    printf("Après modification de la position 1 :\n");
+    affiche(debut);
+
+    return 0;
+}
