@@ -1,0 +1,224 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Etudiant {
+    int id;
+    char nom[50];
+    float moyenne;
+    struct Etudiant* suivant;
+    struct Etudiant* precedent;
+} Etudiant;
+
+Etudiant* creer_etudiant() {
+    Etudiant *etudiant = (Etudiant*)malloc(sizeof(Etudiant));
+    printf("ID: ");
+    scanf("%d", &etudiant->id);  // Correction importante ici aussi : &etudiant->id
+    printf("Nom: ");
+    scanf("%s", etudiant->nom);
+    printf("Moyenne: ");
+    scanf("%f", &etudiant->moyenne);
+
+    etudiant->suivant = NULL;
+    etudiant->precedent = NULL;
+    return etudiant;
+}
+
+int calculer_longueur(Etudiant *debut) {
+    int compteur = 0;
+    while (debut != NULL) {
+        compteur++;
+        debut = debut->suivant;
+    }
+    return compteur;
+}
+
+Etudiant* ajouter_a_position(Etudiant* debut, Etudiant* nouveau, int position) {
+    if (position == 0 || debut == NULL) {
+        nouveau->suivant = debut;
+        if (debut)
+            debut->precedent = nouveau;
+        return nouveau;
+    }
+
+    Etudiant* courant = debut;
+    int indice = 0;
+    while (courant != NULL && indice < position - 1) {
+        courant = courant->suivant;
+        indice++;
+    }
+
+    if (courant != NULL) {
+        nouveau->suivant = courant->suivant;
+        if (courant->suivant)
+            courant->suivant->precedent = nouveau;
+
+        courant->suivant = nouveau;
+        nouveau->precedent = courant;
+    }
+
+    return debut;
+}
+
+void afficher_liste(Etudiant* debut) {
+    Etudiant* courant = debut;
+    while (courant != NULL) {
+        printf("ID: %d, Nom: %s, Moyenne: %.2f\n", courant->id, courant->nom, courant->moyenne);
+        courant = courant->suivant;
+    }
+}
+
+Etudiant* modifier_moyenne(Etudiant* debut, int position, float nouvelle_moyenne) {
+    Etudiant* courant = debut;
+    int indice = 0;
+    while (courant != NULL && indice < position) {
+        courant = courant->suivant;
+        indice++;
+    }
+    if (courant != NULL)
+        courant->moyenne = nouvelle_moyenne;
+
+    return debut;
+}
+
+Etudiant* supprimer_a_position(Etudiant* debut, int position) {
+    Etudiant* courant = debut;
+    int indice = 0;
+
+    while (courant != NULL && indice < position) {
+        courant = courant->suivant;
+        indice++;
+    }
+
+    if (courant != NULL) {
+        if (courant->precedent != NULL)
+            courant->precedent->suivant = courant->suivant;
+        else
+            debut = courant->suivant;
+
+        if (courant->suivant != NULL)
+            courant->suivant->precedent = courant->precedent;
+
+        free(courant);
+    }
+
+    return debut;
+}
+
+Etudiant* obtenir_dernier(Etudiant* debut) {
+    Etudiant* courant = debut;
+    while (courant && courant->suivant != NULL)
+        courant = courant->suivant;
+    return courant;
+}
+
+void afficher_liste_inverse(Etudiant* fin) {
+    Etudiant* courant = fin;
+    while (courant != NULL) {
+        printf("ID: %d, Nom: %s, Moyenne: %.2f\n", courant->id, courant->nom, courant->moyenne);
+        courant = courant->precedent;
+    }
+}
+
+int rechercher_etudiant(Etudiant* debut, int id_recherche) {
+    Etudiant* courant = debut;
+    while (courant != NULL) {
+        if (courant->id == id_recherche)
+            return 1;
+        courant = courant->suivant;
+    }
+    return 0;
+}
+
+Etudiant* trier_par_moyenne(Etudiant* debut) {
+    if (debut == NULL) return NULL;
+
+    int echangé;
+    Etudiant* courant;
+    Etudiant* limite = NULL;
+
+    do {
+        echangé = 0;
+        courant = debut;
+
+        while (courant->suivant != limite) {
+            if (courant->moyenne > courant->suivant->moyenne) {
+                // Échange des données
+                int temp_id = courant->id;
+                char temp_nom[50];
+                strcpy(temp_nom, courant->nom);
+                float temp_moy = courant->moyenne;
+
+                courant->id = courant->suivant->id;
+                strcpy(courant->nom, courant->suivant->nom);
+                courant->moyenne = courant->suivant->moyenne;
+
+                courant->suivant->id = temp_id;
+                strcpy(courant->suivant->nom, temp_nom);
+                courant->suivant->moyenne = temp_moy;
+
+                echangé = 1;
+            }
+            courant = courant->suivant;
+        }
+        limite = courant;
+    } while (echangé);
+
+    return debut;
+}
+
+int main() {
+    Etudiant* debut = NULL;
+
+    printf("Création de 3 étudiants :\n");
+    Etudiant* et1 = creer_etudiant();
+    Etudiant* et2 = creer_etudiant();
+    Etudiant* et3 = creer_etudiant();
+
+    printf("Ajout de chaque étudiant à sa position :\n");
+    debut = ajouter_a_position(debut, et1, 0);
+    debut = ajouter_a_position(debut, et2, 1);
+    debut = ajouter_a_position(debut, et3, 1);
+
+    printf("\nListe des étudiants :\n");
+    afficher_liste(debut);
+
+    int taille = calculer_longueur(debut);
+    printf("\nLongueur de la liste : %d\n", taille);
+
+    int id_recherche;
+    printf("\nEntrer l'ID à rechercher : ");
+    scanf("%d", &id_recherche);
+    if (rechercher_etudiant(debut, id_recherche))
+        printf("Résultat de recherche : Trouvé\n");
+    else
+        printf("Résultat de recherche : Non trouvé\n");
+
+    int position_suppression;
+    printf("\nEntrer la position à supprimer : ");
+    scanf("%d", &position_suppression);
+    debut = supprimer_a_position(debut, position_suppression);
+    printf("\nListe après suppression :\n");
+    afficher_liste(debut);
+
+    int position_modif;
+    float nouvelle_moyenne;
+    printf("\nEntrer la position à modifier : ");
+    scanf("%d", &position_modif);
+    printf("Entrer la nouvelle moyenne : ");
+    scanf("%f", &nouvelle_moyenne);
+    debut = modifier_moyenne(debut, position_modif, nouvelle_moyenne);
+
+    printf("\nListe après modification de la moyenne :\n");
+    afficher_liste(debut);
+
+    debut = trier_par_moyenne(debut);
+    printf("\nListe triée par moyenne :\n");
+    afficher_liste(debut);
+
+    printf("\nAffichage en sens inverse :\n");
+    Etudiant* fin = obtenir_dernier(debut);
+    afficher_liste_inverse(fin);
+
+    return 0;
+}
